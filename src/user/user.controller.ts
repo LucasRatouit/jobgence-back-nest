@@ -26,7 +26,7 @@ export class UserController {
   }
 
   @Get('/:id')
-  findOne(@Param('id', ParseIntPipe) id: number): IUser {
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<IUser> {
     if (isNaN(id)) {
       throw new Error('invalid user id');
     }
