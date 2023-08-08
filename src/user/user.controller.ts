@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
   Delete,
   Body,
   Param,
@@ -9,10 +10,10 @@ import {
 } from '@nestjs/common';
 import { UserService, IUser } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('user')
 export class UserController {
-  // eslint-disable-next-line prettier/prettier
   constructor(private readonly userService: UserService) {}
 
   @Post('/create')
@@ -26,26 +27,39 @@ export class UserController {
   }
 
   @Get('/:id')
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<IUser> {
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<IUser> {
     if (isNaN(id)) {
       throw new Error('invalid user id');
     }
 
-    const user = this.userService.findOne(id);
+    const user = await this.userService.findOne(id);
     if (!user) {
       throw new Error(`User ${id} not found`);
     }
 
     return user;
-  } /*
+  }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
-  }*/
+  @Patch('/:id')
+  async update(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
+    const userIsUpdated = await this.userService.update(id, updateUserDto);
+    if (!userIsUpdated) {
+      return `User ${id} not found`;
+    }
+
+    return this.userService.update(id, updateUserDto);
+  }
 
   @Delete('/:id')
-  remove(@Param('id') id: number) {
-    return this.userService.remove(+id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    if (isNaN(id)) {
+      throw new Error('invalid user id');
+    }
+
+    const userDeleted = await this.userService.remove(id);
+    if (!userDeleted) {
+      throw new Error(`User ${id} not found`);
+    }
+    return userDeleted;
   }
 }

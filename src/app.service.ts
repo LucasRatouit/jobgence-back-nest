@@ -7,7 +7,7 @@ export class AppService {
   constructor(@Inject(PG_CONNECTION) private conn: any) {}
 
   getHello(): string {
-    return 'Hello World!';
+    return 'Hello Nest !!!';
   }
   getTest(): string {
     return 'Test Valid !';
